@@ -1,24 +1,14 @@
 import pygame, random, sys
 
 from game import main_screen, make_grid, gamePlay
+from constants import colors, GAME_STATE, PLAYERS_AND_SYMBOLS, WIN_DIM, FONT, BIG_FONT
 
-colors = {'white' : (220, 220, 220), 'black' : (0, 0, 0), 'green' : (0, 255, 0), 'red' : (255, 0, 0)}
-GAME_STATE = {
-    'mainScreen' : 0, 
-    'gamePlay' : 1, 
-    'gameOver' : 2
-}
 
 # PYGAME CONFIG
-WIN_DIM = 500
 pygame.init()
 window = pygame.display.set_mode((WIN_DIM,WIN_DIM))
 window.fill(colors['white'])
 pygame.display.flip()
-
-pygame.font.init()
-FONT = pygame.font.SysFont("Arial", 30)
-BIG_FONT = pygame.font.SysFont("Arial", 90)
 
 
 # MAIN LOOP
@@ -26,7 +16,7 @@ run = True
 gameState = 'mainScreen'
 clock = pygame.time.Clock()
 chosenSymbol = ''
-turn = 1
+turn = 0
 
 def changeGameState(state):
     if state == 'gameScreen':
@@ -51,25 +41,31 @@ while run:
                     if 90 < event.pos[0] < 160 and 200 < event.pos[1] < 270:
                         gameState = 'gameScreen'
                         chosenSymbol = 'O'
+                        PLAYERS_AND_SYMBOLS[1] = 'O'
+                        PLAYERS_AND_SYMBOLS[2] = 'X'
                         callFunc = True
+                        print(PLAYERS_AND_SYMBOLS)
 
 
                     # for X 270 to 270 + 70
                     if 270 < event.pos[0] < 340 and 200 < event.pos[1] < 270:
                         gameState = 'gameScreen'
                         chosenSymbol = 'X'
+                        PLAYERS_AND_SYMBOLS[1] = 'X'
+                        PLAYERS_AND_SYMBOLS[2] = 'O'
                         callFunc = True
+                        print(PLAYERS_AND_SYMBOLS)
 
         elif gameState == 'gameScreen':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    gamePlay(window, event, chosenSymbol, turn)
-                    turn += 1
+                    willIncrease = gamePlay(window, event, chosenSymbol, turn)
+                    print(f'willIncrease = {willIncrease}')
+                    
+                    if willIncrease is not None:
+                        turn  += 1
 
     if callFunc:
         changeGameState(gameState)
     
     callFunc = False
-
-
-

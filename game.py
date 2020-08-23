@@ -1,15 +1,10 @@
-import pygame
+import pygame, random
 from termcolor import colored
+from constants import colors, GAME_STATE, PLAYERS_AND_SYMBOLS, FONT, BIG_FONT, WIN_DIM
+
 
 gameBoard = [[0]*3 for _ in range(3)]
 ox = ['O', 'X']
-
-pygame.font.init()
-FONT = pygame.font.SysFont("Arial", 30)
-BIG_FONT = pygame.font.SysFont("Arial", 90)
-WIN_DIM = 500
-
-colors = {'white' : (220, 220, 220), 'black' : (0, 0, 0), 'green' : (0, 255, 0), 'red' : (255, 0, 0)}
 
 def main_screen(window):
     text = FONT.render("Choose your Symbol", 1, colors['black'])
@@ -80,6 +75,20 @@ def placeSymbols(window):
     pygame.display.update()
 
 
+def show_end_screen(window, winner):
+
+    window.fill(colors['white'])
+
+    t = f'{winner} wins'
+    text = FONT.render(t, 1, colors['green'] if winner == 'O' else colors['red'])
+
+    window.blit(text, 
+        (( WIN_DIM - text.get_width() )//2, 10)
+        )
+    
+    pygame.display.update()
+
+
 def isGameOver(symbol, row, column):
     strikeRow = strikeCol = strikeMajorDiag = strikeMinorDiag = True
 
@@ -90,7 +99,6 @@ def isGameOver(symbol, row, column):
     for row in range(len(gameBoard)):
         if gameBoard[row][column] != symbol:
             strikeCol = False
-        print(row, col)
 
     # major diagonal
     i = j = 0
@@ -110,27 +118,43 @@ def isGameOver(symbol, row, column):
 
     return strikeRow or strikeCol or strikeMajorDiag or strikeMinorDiag
 
-    
+
+def getRandomNumbers():
+    return random.randrange(3), random.randrange(3)
+
 
 def gamePlay(window, event, playerSymbol, turn):
     # O always goes first, fix that
-    symbol = ox[0] if turn % 2 == 1 else ox[1]
+    symbol = PLAYERS_AND_SYMBOLS[(turn % 2) + 1]
 
-    if 100 < event.pos[0] < 400 and 100 < event.pos[1] < 400:
+    if (turn % 2) + 1 == 1:
+        
+        if 100 < event.pos[0] < 400 and 100 < event.pos[1] < 400:
 
-        xPos = event.pos[1] // 100 - 1
-        yPos = event.pos[0] // 100 - 1
+            xPos = event.pos[1] // 100 - 1
+            yPos = event.pos[0] // 100 - 1
+
+            if gameBoard[xPos][yPos] != 0:
+                return None
+
+            gameBoard[xPos][yPos] = symbol
+
+    else:
+        xPos, yPos = getRandomNumbers()
+
+        while gameBoard[xPos][yPos] != 0:
+            xPos, yPos = getRandomNumbers()
 
         gameBoard[xPos][yPos] = symbol
-        print(f'xPos = {xPos} , yPos = {yPos}')
-        print_board()
 
-        if isGameOver(symbol, xPos, yPos):
-            print(f"{symbol} wins")
 
-        # print(gameBoard)
+    if isGameOver(symbol, xPos, yPos):
+        show_end_screen(window, symbol)
+        print(f"{symbol} wins")
 
-        placeSymbols(window)
+    placeSymbols(window)
+
+    return True
 
 
 def print_board():
@@ -149,7 +173,3 @@ def print_board():
                 string += colored(x, 'red') + '  '
 
     print(string + "\n\n")
-
-
-
-
