@@ -26,10 +26,11 @@ run = True
 gameState = 'mainScreen'
 clock = pygame.time.Clock()
 chosenSymbol = ''
+turn = 1
 
 def changeGameState(state):
     if state == 'gameScreen':
-        make_grid(window)
+        make_grid(window, chosenSymbol)
 
 
 main_screen(window)
@@ -62,7 +63,8 @@ while run:
         elif gameState == 'gameScreen':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    gamePlay(window, event, str(chosenSymbol))
+                    gamePlay(window, event, chosenSymbol, turn)
+                    turn += 1
 
     if callFunc:
         changeGameState(gameState)
