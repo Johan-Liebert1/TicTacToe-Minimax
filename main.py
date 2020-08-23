@@ -60,7 +60,6 @@ while run:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     willIncrease = gamePlay(window, event, chosenSymbol, turn)
-                    print(f'willIncrease = {willIncrease}')
                     
                     if willIncrease is not None:
                         turn  += 1

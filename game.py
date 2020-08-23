@@ -31,7 +31,7 @@ def make_grid(window, chosenSymbol):
     p2 = 'X' if p1 == 'O' else 'O'
 
     p1Text = FONT.render(f"Player 1 : {p1}", 1, colors['green'] if p1 == 'O' else colors['red'])
-    p2Text = FONT.render(f"Player 2 : {p2}", 1, colors['green'] if p2 == 'O' else colors['red'])
+    p2Text = FONT.render(f"Computer : {p2}", 1, colors['green'] if p2 == 'O' else colors['red'])
 
     totalWidth = p1Text.get_width() + p2Text.get_width()
 
@@ -79,14 +79,26 @@ def show_end_screen(window, winner):
 
     window.fill(colors['white'])
 
-    t = f'{winner} wins'
-    text = FONT.render(t, 1, colors['green'] if winner == 'O' else colors['red'])
+    if len(winner) > 0:
+        t = f'{winner} wins'
+        text = FONT.render(t, 1, colors['green'] if winner == 'O' else colors['red'])
+    
+    else:
+        text = FONT.render('Draw', 1, colors['black'])
 
     window.blit(text, 
         (( WIN_DIM - text.get_width() )//2, 10)
         )
     
     pygame.display.update()
+
+
+def find_empty():
+    for i in range(3):
+        for j in range(3):
+            if gameBoard[i][j] == 0:
+                return True
+    return False
 
 
 def isGameOver(symbol, row, column):
@@ -119,6 +131,7 @@ def isGameOver(symbol, row, column):
     return strikeRow or strikeCol or strikeMajorDiag or strikeMinorDiag
 
 
+
 def getRandomNumbers():
     return random.randrange(3), random.randrange(3)
 
@@ -147,10 +160,15 @@ def gamePlay(window, event, playerSymbol, turn):
 
         gameBoard[xPos][yPos] = symbol
 
+    gameO = isGameOver(symbol, xPos, yPos) 
 
-    if isGameOver(symbol, xPos, yPos):
+    if gameO:
         show_end_screen(window, symbol)
         print(f"{symbol} wins")
+
+    if not gameO and not find_empty():
+        show_end_screen(window, '')
+
 
     placeSymbols(window)
 
