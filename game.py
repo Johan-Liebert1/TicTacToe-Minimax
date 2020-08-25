@@ -1,6 +1,6 @@
 import pygame, random
 from termcolor import colored
-from constants import colors, GAME_STATE, PLAYERS_AND_SYMBOLS, FONT, BIG_FONT, WIN_DIM, isGameOver, find_empty,checkWinner
+from constants import colors, GAME_STATE, PLAYERS_AND_SYMBOLS, FONT, BIG_FONT, WIN_DIM, find_empty,checkWinner
 from minimax import minimax
 
 

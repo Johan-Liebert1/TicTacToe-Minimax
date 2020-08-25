@@ -1,5 +1,5 @@
 from constants import PLAYERS_AND_SYMBOLS
-from constants import find_empty, isGameOver, checkWinner
+from constants import find_empty, checkWinner
 
 # considering AI to always be the maximizing player
 def setVars():
