@@ -59,9 +59,9 @@ while run:
         elif gameState == 'gameScreen':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    willIncrease = gamePlay(window, event, chosenSymbol, turn)
+                    nextTurn = gamePlay(window, event, chosenSymbol, turn)
                     
-                    if willIncrease is not None:
+                    if nextTurn is not None:
                         turn  += 1
 
     if callFunc:

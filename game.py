@@ -1,10 +1,10 @@
 import pygame, random
 from termcolor import colored
-from constants import colors, GAME_STATE, PLAYERS_AND_SYMBOLS, FONT, BIG_FONT, WIN_DIM
+from constants import colors, GAME_STATE, PLAYERS_AND_SYMBOLS, FONT, BIG_FONT, WIN_DIM, isGameOver, find_empty,checkWinner
+from minimax import minimax
 
 
 gameBoard = [[0]*3 for _ in range(3)]
-ox = ['O', 'X']
 
 def main_screen(window):
     text = FONT.render("Choose your Symbol", 1, colors['black'])
@@ -79,7 +79,7 @@ def show_end_screen(window, winner):
 
     window.fill(colors['white'])
 
-    if len(winner) > 0:
+    if winner != 'Draw':
         t = f'{winner} wins'
         text = FONT.render(t, 1, colors['green'] if winner == 'O' else colors['red'])
     
@@ -93,54 +93,10 @@ def show_end_screen(window, winner):
     pygame.display.update()
 
 
-def find_empty():
-    for i in range(3):
-        for j in range(3):
-            if gameBoard[i][j] == 0:
-                return True
-    return False
-
-
-def isGameOver(symbol, row, column):
-    strikeRow = strikeCol = strikeMajorDiag = strikeMinorDiag = True
-
-    for col in range(len(gameBoard)):
-        if gameBoard[row][col] != symbol:
-            strikeRow = False
-
-    for row in range(len(gameBoard)):
-        if gameBoard[row][column] != symbol:
-            strikeCol = False
-
-    # major diagonal
-    i = j = 0
-    while 0 <= i < len(gameBoard) and 0 <= j < len(gameBoard):
-        if gameBoard[i][j] != symbol:
-            strikeMajorDiag = False
-        i += 1
-        j += 1
-
-    i = 0
-    j = len(gameBoard) - 1
-    while 0 <= i < len(gameBoard) and 0 <= j < len(gameBoard):
-        if gameBoard[i][j] != symbol:
-            strikeMinorDiag = False
-        i += 1
-        j -= 1
-
-    return strikeRow or strikeCol or strikeMajorDiag or strikeMinorDiag
-
-
-
-def getRandomNumbers():
-    return random.randrange(3), random.randrange(3)
-
-
 def gamePlay(window, event, playerSymbol, turn):
-    # O always goes first, fix that
     symbol = PLAYERS_AND_SYMBOLS[(turn % 2) + 1]
 
-    if (turn % 2) + 1 == 1:
+    if (turn % 2) + 1 == 1: # player's turn
         
         if 100 < event.pos[0] < 400 and 100 < event.pos[1] < 400:
 
@@ -152,22 +108,33 @@ def gamePlay(window, event, playerSymbol, turn):
 
             gameBoard[xPos][yPos] = symbol
 
-    else:
-        xPos, yPos = getRandomNumbers()
+    else: # computer's turn
+        bestScore = -1000
 
-        while gameBoard[xPos][yPos] != 0:
-            xPos, yPos = getRandomNumbers()
+        for i in range(3):
+            for j in range(3):
+                
+                if gameBoard[i][j] == 0:
+
+                    gameBoard[i][j] = symbol
+
+                    score = minimax(gameBoard, 0, False)
+
+                    gameBoard[i][j] = 0
+
+                    if score > bestScore:
+                        bestScore = score
+                        xPos = i
+                        yPos = j
+
 
         gameBoard[xPos][yPos] = symbol
 
-    gameO = isGameOver(symbol, xPos, yPos) 
 
-    if gameO:
-        show_end_screen(window, symbol)
-        print(f"{symbol} wins")
+    gameO = checkWinner(gameBoard) 
 
-    if not gameO and not find_empty():
-        show_end_screen(window, '')
+    if gameO is not None:
+        show_end_screen(window, gameO)
 
 
     placeSymbols(window)
